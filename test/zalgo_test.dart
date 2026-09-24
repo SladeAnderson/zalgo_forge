@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zalgo_forge/models/ZalgoPreset.model.dart';
 import 'package:zalgo_forge/utilities/zalgo.dart';
 
 void main() {
@@ -26,7 +27,7 @@ void main() {
   });
   test('presets are reachable and detected', () {
     final ZalgoOptions options = ZalgoOptions.fromPreset(ZalgoPreset.cursed);
-    expect(options.matchingPreset, ZalgoPreset.cursed);
+    expect(options.matchingPreset(ZalgoPreset.builtIns), ZalgoPreset.cursed);
   });
   test('newlines survive', () {
     const ZalgoOptions options = ZalgoOptions(

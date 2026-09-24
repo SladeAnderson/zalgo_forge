@@ -135,29 +135,33 @@ class ControlsPanel extends StatelessWidget {
              
               Readout(icon: Icons.south, value: options.belowCount),
               
-              ElevatedButton(onPressed: () async {
-                final TextEditingController nameCtrl = TextEditingController();
-                final String? name = await showDialog<String>(
-                    context: context, 
-                    builder: (BuildContext context) => AlertDialog(
-                      title: const Text("Preset name"),
-                      content: TextField(controller: nameCtrl, autofocus: true),
-                      actions: <Widget>[
-                        TextButton(
-                          onPressed: () => Navigator.pop(context), 
-                          child: const Text("Cancel")
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, nameCtrl.text.trim()), 
-                          child: const Text('Save'),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (name != null && name.isNotEmpty) onSavePreset(name);
-              }, child: const Text("Save Preset"))
             ],
           ),
+
+          const SizedBox(height: 8,),
+
+          ElevatedButton(
+            onPressed: () async {
+            final TextEditingController nameCtrl = TextEditingController();
+            final String? name = await showDialog<String>(
+                context: context, 
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text("Preset name"),
+                  content: TextField(controller: nameCtrl, autofocus: true),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context), 
+                      child: const Text("Cancel")
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, nameCtrl.text.trim()), 
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              );
+              if (name != null && name.isNotEmpty) onSavePreset(name);
+          }, child: const Text("Save Preset"))
         ],
       ),
     );
