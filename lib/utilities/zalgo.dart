@@ -215,15 +215,19 @@ class ZalgoOptions {
 /// Corrupts [input]. Deterministic for a given input and options.
 String zalgoify(String input, ZalgoOptions options) {
   if (input.isEmpty) return '';
+  
   final Random rng = Random(options.seed);
   final StringBuffer buffer = StringBuffer();
   final int above = options.aboveCount;
   final int strike = options.strikeCount;
   final int below = options.belowCount;
+
   for (final String grapheme in input.characters) {
     buffer.write(grapheme);
+    
     if (grapheme == '\n' || grapheme == '\r') continue;
     if (!options.corruptSpaces && grapheme.trim().isEmpty) continue;
+    
     _spray(buffer, rng, _above, above);
     _spray(buffer, rng, _middle, strike);
     _spray(buffer, rng, _below, below);
@@ -244,7 +248,9 @@ void _spray(
   int intensity,
 ) {
   if (intensity <= 0) return;
+  
   final int count = 1 + rng.nextInt(intensity);
+  
   for (int i = 0; i < count; i++) {
     buffer.write(marks[rng.nextInt(marks.length)]);
   }
