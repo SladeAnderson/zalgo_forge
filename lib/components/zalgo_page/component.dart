@@ -23,6 +23,7 @@ class _ZalgoPageState extends State<ZalgoPage> {
     text: 'from beyond the veil',
   );
 
+
   ZalgoOptions _options = ZalgoOptions.fromPreset(ZalgoPreset.uneasy);
 
   List<ZalgoPreset> _presets = <ZalgoPreset>[...ZalgoPreset.builtIns];
@@ -85,11 +86,20 @@ class _ZalgoPageState extends State<ZalgoPage> {
   Future<void> _loadPresets() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final List<String> saved = prefs.getStringList('presets') ?? <String>[];
+    final List<ZalgoPreset> loaded = <ZalgoPreset>[];
+
+    for (final String s in saved) {
+      try {
+        loaded.add(ZalgoPreset.fromJson(jsonDecode(s)));
+      } catch (_) {
+        
+      }
+    }
 
     setState(() {
       _presets = <ZalgoPreset>[
         ...ZalgoPreset.builtIns,
-        ...saved.map((String s) => ZalgoPreset.fromJson(jsonDecode(s))),
+        ...loaded
       ];
     });
   }
