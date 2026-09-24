@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:characters/characters.dart';
+import 'package:zalgo_forge/models/ZalgoPreset.model.dart';
 
 /// Marks that stack *above* the base character.
 const List<String> _above = <String>[
@@ -128,22 +129,22 @@ const List<String> _below = <String>[
 
 /// Named points in the option space. Dart 3 enhanced enums carry fields, so
 /// a preset *is* its values — no lookup table.
-enum ZalgoPreset {
-  faint('Faint', 0.10, 0.0, 0.10),
-  uneasy('Uneasy', 0.25, 0.0, 0.25),
-  haunted('Haunted', 0.45, 0.0, 0.40),
-  cursed('Cursed', 0.70, 0.0, 0.55),
-  obliterated('Obliterated', 1.00, 0.0, 0.90),
-  ascending('Ascending', 0.55, 0.9, 0.20),
-  descending('Descending', 0.55, -0.9, 0.20);
+// enum ZalgoPreset {
+//   faint('Faint', 0.10, 0.0, 0.10),
+//   uneasy('Uneasy', 0.25, 0.0, 0.25),
+//   haunted('Haunted', 0.45, 0.0, 0.40),
+//   cursed('Cursed', 0.70, 0.0, 0.55),
+//   obliterated('Obliterated', 1.00, 0.0, 0.90),
+//   ascending('Ascending', 0.55, 0.9, 0.20),
+//   descending('Descending', 0.55, -0.9, 0.20);
 
-  const ZalgoPreset(this.label, this.chaos, this.balance, this.strike);
+//   const ZalgoPreset(this.label, this.chaos, this.balance, this.strike);
 
-  final String label;
-  final double chaos;
-  final double balance;
-  final double strike;
-}
+//   final String label;
+//   final double chaos;
+//   final double balance;
+//   final double strike;
+// }
 
 class ZalgoOptions {
   const ZalgoOptions({
@@ -185,7 +186,7 @@ class ZalgoOptions {
 
   /// Which preset (if any) these values currently sit on.
   ZalgoPreset? get matchingPreset {
-    for (final ZalgoPreset preset in ZalgoPreset.values) {
+    for (final ZalgoPreset preset in ZalgoPreset.builtIns) {
       if ((preset.chaos - chaos).abs() < 0.005 &&
           (preset.balance - balance).abs() < 0.005 &&
           (preset.strike - strike).abs() < 0.005) {

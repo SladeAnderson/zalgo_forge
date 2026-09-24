@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zalgo_forge/models/ZalgoPreset.model.dart';
 
 import '../../utilities/zalgo.dart';
 import '../controls_panel/component.dart';
@@ -10,6 +11,7 @@ import '../preview_panel/component.dart';
 
 class ZalgoPage extends StatefulWidget {
   const ZalgoPage({super.key});
+  
   @override
   State<ZalgoPage> createState() => _ZalgoPageState();
 }
@@ -20,6 +22,8 @@ class _ZalgoPageState extends State<ZalgoPage> {
   );
 
   ZalgoOptions _options = ZalgoOptions.fromPreset(ZalgoPreset.uneasy);
+
+  List<ZalgoPreset> _presets = <ZalgoPreset>[...ZalgoPreset.builtIns];
 
   @override
   void initState() {
@@ -39,6 +43,13 @@ class _ZalgoPageState extends State<ZalgoPage> {
   String get _output => zalgoify(_input.text, _options);
 
   void _setOptions(ZalgoOptions next) => setState(() => _options = next);
+
+  void _addPreset(String name) => setState(() {
+    _presets = <ZalgoPreset>[
+      ..._presets,
+      ZalgoPreset(name, _options.chaos, _options.balance, _options.strike),
+    ];
+  });
 
   void _reroll() =>
       _setOptions(_options.copyWith(seed: Random().nextInt(1 << 30)));
@@ -65,6 +76,8 @@ class _ZalgoPageState extends State<ZalgoPage> {
       options: _options,
       onChanged: _setOptions,
       onClean: _clean,
+      presets: _presets,
+      onSavePreset: _addPreset,
     );
 
     final Widget preview = PreviewPanel(
