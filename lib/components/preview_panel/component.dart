@@ -37,10 +37,9 @@ class PreviewPanel extends StatelessWidget {
                 Positioned.fill(
                   // Lets taps through so the text stays selectable.
                   child: IgnorePointer(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 600),
-                      child: showImu ? const ImuEye() : const SizedBox.shrink(),
-                    ),
+                    // Kept in the tree either way: the eye opens and shuts
+                    // itself, so it can close from wherever the lid is.
+                    child: ImuEye(visible: showImu),
                   ),
                 ),
 
@@ -65,51 +64,56 @@ class PreviewPanel extends StatelessWidget {
           ),
 
           const Divider(height: 1),
+        
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: <Widget>[
-                Text(
-                  '${text.length} chars',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                if (text.length > 2000) ...<Widget>[
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.warning_amber_outlined,
-                    size: 16,
-                    color: theme.colorScheme.error,
-                  ),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      'may be rejected by chat apps',
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.error,
-                      ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    '${text.length} chars',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
+                  if (text.length > 2000) ...<Widget>[
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.warning_amber_outlined,
+                      size: 16,
+                      color: theme.colorScheme.error,
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        'may be rejected by chat apps',
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: onReroll,
+                    icon: const Icon(Icons.casino_outlined, size: 18),
+                    label: const Text('Reroll'),
+                  ),
+                  const SizedBox(width: 4),
+                  FilledButton.icon(
+                    onPressed: onCopy,
+                    icon: const Icon(Icons.copy_all_outlined, size: 18),
+                    label: const Text('Copy'),
+                  ),
                 ],
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: onReroll,
-                  icon: const Icon(Icons.casino_outlined, size: 18),
-                  label: const Text('Reroll'),
-                ),
-                const SizedBox(width: 4),
-                FilledButton.icon(
-                  onPressed: onCopy,
-                  icon: const Icon(Icons.copy_all_outlined, size: 18),
-                  label: const Text('Copy'),
-                ),
-              ],
+              ),
             ),
           ),
-        ],
+       
+       ],
       ),
     );
   }

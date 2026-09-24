@@ -16,10 +16,13 @@ const Color _ember = Color(0xFFFF4A3D);
 const Color _sclera = Color(0xFFEFE4D2);
 const Color _bloodshot = Color(0xFFB0504A);
 
-/// Imu's ringed eye staring out of the dark. Opens when it first appears,
-/// then the iris breathes and the glow flickers.
+/// Imu's ringed eye staring out of the dark. Opens while [visible] is true,
+/// with the iris breathing and the glow flickering, and snaps shut when it
+/// goes false. Paints nothing at all once it is fully closed.
 class ImuEye extends StatefulWidget {
-  const ImuEye({super.key});
+  const ImuEye({super.key, required this.visible});
+
+  final bool visible;  // <-- true while the text names Imu
 
   @override
   State<ImuEye> createState() => _ImuEyeState();
@@ -28,7 +31,7 @@ class ImuEye extends StatefulWidget {
 class _ImuEyeState extends State<ImuEye> with TickerProviderStateMixin {
   late final AnimationController _open;
   late final AnimationController _pulse;
-  late final Animation<double> _lid;
+  late final CurvedAnimation _lid;
 
   @override
   void initState() {
@@ -36,19 +39,48 @@ class _ImuEyeState extends State<ImuEye> with TickerProviderStateMixin {
 
     _open = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..forward();
+      duration: const Duration(milliseconds: 900),        // opening
+      reverseDuration: const Duration(milliseconds: 450), // shutting, twice as fast
+    )..addStatusListener((AnimationStatus status) {
+      // Fully shut: nothing is on screen, so stop burning frames on the pulse.
+      if (status == AnimationStatus.dismissed) _pulse.stop();
+    });
 
     _pulse = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
-    )..repeat(reverse: true);
+    );
 
-    _lid = CurvedAnimation(parent: _open, curve: Curves.easeOutBack);
+    // easeOutBack overshoots past 1 on the way open, which snaps the lid wide.
+    // The reverse curve must not do that: dipping below 0 would make the eye
+    // vanish a frame early instead of closing all the way.
+    _lid = CurvedAnimation(
+      parent: _open,
+      curve: Curves.easeOutBack,
+      reverseCurve: Curves.easeInCubic,
+    );
+
+    if (widget.visible) _openEye();
+  }
+
+  @override
+  void didUpdateWidget(ImuEye oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.visible == oldWidget.visible) return;
+
+    // Both start from the lid's current position, so backspacing mid-open
+    // reverses from there instead of jumping.
+    widget.visible ? _openEye() : _open.reverse();
+  }
+
+  void _openEye() {
+    _pulse.repeat(reverse: true);
+    _open.forward();
   }
 
   @override
   void dispose() {
+    _lid.dispose();
     _open.dispose();
     _pulse.dispose();
     super.dispose();
@@ -79,18 +111,23 @@ class _ImuEyePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Shut: Imu is gone, so leave the panel alone entirely.
+    if (open <= 0) return;
+
     final Rect bounds = Offset.zero & size;
     final Offset center = bounds.center;
 
-    // The shadow Imu always hides in.
+    // The shadow Imu always hides in. It lifts with the lid, so closing the
+    // eye doesn't leave the preview darkened.
+    final double veil = open.clamp(0.0, 1.0);
     canvas.drawRect(
       bounds,
       Paint()
         ..shader = RadialGradient(
           radius: 0.9,
           colors: <Color>[
-            _void.withValues(alpha: 0.9),
-            _void.withValues(alpha: 0.6),
+            _void.withValues(alpha: 0.9 * veil),
+            _void.withValues(alpha: 0.6 * veil),
             _void.withValues(alpha: 0),
           ],
           stops: const <double>[0, 0.5, 1],

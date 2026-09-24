@@ -48,7 +48,7 @@ class BigSlider extends StatelessWidget {
 
         Row(
           children: <Widget>[
-            if (leading != null) leading!,
+           ?leading,
 
             Expanded(
               child: Slider(
@@ -60,7 +60,7 @@ class BigSlider extends StatelessWidget {
               ),
             ),
 
-            if (trailing != null) trailing!,
+            ?trailing,
           ],
         ),
       ],
