@@ -141,12 +141,12 @@ class ControlsPanel extends StatelessWidget {
                       content: TextField(controller: nameCtrl, autofocus: true),
                       actions: <Widget>[
                         TextButton(
-                          onPressed: () => Navigator.pop(context, nameCtrl.text.trim()), 
-                          child: const Text('Save'),
+                          onPressed: () => Navigator.pop(context), 
+                          child: const Text("Cancel")
                         ),
                         TextButton(
-                          onPressed: () => Navigator.pop(context), 
-                          child: const Text("cancel")
+                          onPressed: () => Navigator.pop(context, nameCtrl.text.trim()), 
+                          child: const Text('Save'),
                         ),
                       ],
                     ),
