@@ -185,8 +185,8 @@ class ZalgoOptions {
   double get lineHeight => 1.3 + chaos * 3.4;
 
   /// Which preset (if any) these values currently sit on.
-  ZalgoPreset? get matchingPreset {
-    for (final ZalgoPreset preset in ZalgoPreset.builtIns) {
+  ZalgoPreset? matchingPreset(List<ZalgoPreset> presets) {
+    for (final ZalgoPreset preset in presets) {
       if ((preset.chaos - chaos).abs() < 0.005 &&
           (preset.balance - balance).abs() < 0.005 &&
           (preset.strike - strike).abs() < 0.005) {

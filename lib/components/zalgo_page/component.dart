@@ -25,6 +25,8 @@ class _ZalgoPageState extends State<ZalgoPage> {
 
   List<ZalgoPreset> _presets = <ZalgoPreset>[...ZalgoPreset.builtIns];
 
+  String? _SelectedPresetID = ZalgoPreset.uneasy.id;
+
   @override
   void initState() {
     super.initState();
@@ -42,14 +44,44 @@ class _ZalgoPageState extends State<ZalgoPage> {
 
   String get _output => zalgoify(_input.text, _options);
 
-  void _setOptions(ZalgoOptions next) => setState(() => _options = next);
-
-  void _addPreset(String name) => setState(() {
-    _presets = <ZalgoPreset>[
-      ..._presets,
-      ZalgoPreset(name, _options.chaos, _options.balance, _options.strike),
-    ];
+  void _setOptions(ZalgoOptions next) => setState(() {
+    if (next.chaos != _options.chaos || 
+      next.balance != _options.balance ||
+      next.strike != _options.strike) {
+      _SelectedPresetID = null;
+    }
+    _options = next;
   });
+
+  void _selectPreset(ZalgoPreset preset) => setState(() {
+    _SelectedPresetID = preset.id;
+    _options = _options.copyWith(
+      chaos: preset.chaos,
+      balance: preset.balance,
+      strike: preset.strike,
+    );
+  });
+
+  void _addPreset(String name) {
+    final ZalgoPreset preset = ZalgoPreset(
+      DateTime.now().microsecondsSinceEpoch.toString(), 
+      name, _options.chaos, _options.balance, _options.strike
+    );
+
+    setState(() {
+      _presets = <ZalgoPreset>[..._presets, preset ];
+      _SelectedPresetID = preset.id;
+    });
+  }
+
+  void _deletePreset(ZalgoPreset preset) {
+    setState(() {
+      _presets = _presets.where((ZalgoPreset p) => p.id != preset.id).toList();
+      if (_SelectedPresetID == preset.id) _SelectedPresetID = null;
+    });
+  }
+
+
 
   void _reroll() =>
       _setOptions(_options.copyWith(seed: Random().nextInt(1 << 30)));
@@ -78,6 +110,9 @@ class _ZalgoPageState extends State<ZalgoPage> {
       onClean: _clean,
       presets: _presets,
       onSavePreset: _addPreset,
+      selectedPresetId: _SelectedPresetID,
+      onPresetSelected: _selectPreset,
+      onPresetDeleted: _deletePreset,
     );
 
     final Widget preview = PreviewPanel(

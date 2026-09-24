@@ -14,6 +14,9 @@ class ControlsPanel extends StatelessWidget {
     required this.onClean,
     required this.presets,
     required this.onSavePreset,
+    this.selectedPresetId,
+    required this.onPresetSelected,
+    required this.onPresetDeleted,
   });
 
   final TextEditingController controller;
@@ -22,6 +25,9 @@ class ControlsPanel extends StatelessWidget {
   final VoidCallback onClean;
   final List<ZalgoPreset> presets;
   final ValueChanged<String> onSavePreset;
+  final String? selectedPresetId;
+  final ValueChanged<ZalgoPreset> onPresetSelected;
+  final ValueChanged<ZalgoPreset> onPresetDeleted;
 
   @override
   Widget build(BuildContext context) {
@@ -57,16 +63,13 @@ class ControlsPanel extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: presets.map((ZalgoPreset preset) {
-              return ChoiceChip(
+              final bool isBuiltIn = ZalgoPreset.builtIns.contains(preset);
+
+              return InputChip(
                 label: Text(preset.label),
-                selected: options.matchingPreset == preset,
-                onSelected: (_) => onChanged(
-                  options.copyWith(
-                    chaos: preset.chaos,
-                    balance: preset.balance,
-                    strike: preset.strike,
-                  ),
-                ),
+                selected: preset.id == selectedPresetId,
+                onSelected: (_) => onPresetSelected(preset),
+                onDeleted: isBuiltIn ? null : () => onPresetDeleted(preset),
               );
             }).toList(),
           ),
